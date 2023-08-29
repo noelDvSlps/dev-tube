@@ -1,3 +1,5 @@
+const Course = require("../models/Course");
+
 // @desc Get all courses
 //@route GET /api/vi/courses
 //@access PUBLIC
@@ -17,8 +19,14 @@ exports.getCourse = (req, res, next) => {
 // @desc Create a new course
 //@route POST /api/vi/courses/
 //@access PRIVATE
-exports.createCourse = (req, res, next) => {
-  res.status(200).json({ success: true, msg: "Created new course" });
+exports.createCourse = async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const course = await Course.create(req.body);
+    res.status(201).json({ success: true, data: course });
+  } catch (err) {
+    res.status(201).json({ success: false, error: err });
+  }
 };
 
 // @desc Update single course
