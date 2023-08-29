@@ -3,17 +3,30 @@ const Course = require("../models/Course");
 // @desc Get all courses
 //@route GET /api/vi/courses
 //@access PUBLIC
-exports.getCourses = (req, res, next) => {
-  res.status(200).json({ success: true, msg: "Get all courses" });
+exports.getCourses = async (req, res, next) => {
+  try {
+    const courses = await Course.find();
+    res
+      .status(200)
+      .json({ success: true, count: courses.length, data: courses });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc Get single course
 //@route GET /api/vi/courses/:id
 //@access PUBLIC
-exports.getCourse = (req, res, next) => {
-  res
-    .status(200)
-    .json({ success: true, msg: `Get single course by ID: ${req.params.id}` });
+exports.getCourse = async (req, res, next) => {
+  try {
+    const courses = await Course.findById(req.params.id);
+    if (!courses) {
+      return res.status(400).json({ success: false });
+    }
+    res.status(200).json({ success: true, data: courses });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc Create a new course
@@ -32,19 +45,33 @@ exports.createCourse = async (req, res, next) => {
 // @desc Update single course
 //@route PUT /api/vi/courses/:id
 //@access PRIVATE
-exports.updateCourse = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    msg: `Update single course by ID: ${req.params.id}`,
-  });
+exports.updateCourse = async (req, res, next) => {
+  try {
+    const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!course) {
+      return res.status(400).json({ success: false });
+    }
+    res.status(200).json({ success: true, data: course });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc Delete single course
 //@route DELETE /api/vi/courses/:id
 //@access PRIVATE
-exports.deleteCourse = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    msg: `Delete single course by ID: ${req.params.id}`,
-  });
+exports.deleteCourse = async (req, res, next) => {
+  try {
+    const course = await Course.findByIdAndDelete(req.params.id);
+    if (!course) {
+      return res.status(400).json({ success: false });
+    }
+    res.status(200).json({ success: true, data: {} });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
